@@ -1,0 +1,11 @@
+a=45
+b=96.6
+c="harry"
+d="32"
+print(type(a))
+print(type(b))
+print(type(c))
+print(type(d))
+e=float(d)
+print(e)
+print(type(e))
