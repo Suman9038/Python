@@ -1,4 +1,4 @@
-from fastapi import FastAPI,Response,status,HTTPException
+from fastapi import FastAPI,Response,status,HTTPException,Depends
 from fastapi.params import Body
 from pydantic import BaseModel
 from typing import Optional
@@ -6,6 +6,11 @@ from random import randrange
 import mysql.connector
 from mysql.connector import errorcode
 import time
+from sqlalchemy.orm import Session
+from . import models
+from .database import engine,get_db
+
+models.Base.metadata.create_all(bind=engine)
 
 app=FastAPI()
 
@@ -16,7 +21,7 @@ class Post(BaseModel) :
 
 while True :
     try :
-        conn= mysql.connector.connect(user="root",password="Suman@2003",host="localhost",database="fastapi")
+        conn= mysql.connector.connect(user="root",password="Suman2003",host="localhost",database="fastapi")
         cursor=conn.cursor(dictionary=True)
         print("DATABASE CONNECTION WAS SUCCESSFULL!!")
         break
@@ -51,6 +56,11 @@ def find_index_post(id : int) :
 @app.get("/")
 def root () :
     return{"Message":"Hello world"}
+
+@app.get("/sqlalchemy") 
+def test_req(db : Session = Depends(get_db)) :
+    return{"data" : "successful"}
+
 
 @app.get("/posts")
 def get_Post() :
