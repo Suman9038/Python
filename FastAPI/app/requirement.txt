@@ -21,3 +21,4 @@ typing
 mysql-connector-python
 sqlalchemy
 mysqlclient
+fastapi
