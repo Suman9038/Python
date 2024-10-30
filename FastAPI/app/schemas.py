@@ -1,5 +1,5 @@
-from pydantic import BaseModel
-
+from pydantic import BaseModel,EmailStr
+from datetime import datetime
 class PostBase(BaseModel) :
     title : str
     content : str
@@ -24,3 +24,23 @@ class Create_Post(PostBase) : # simply inherit karo PostBase ka toh waara sara c
                 #OR
 class Update_Post(PostBase) :
     pass
+
+
+class PostResponse(PostBase) :
+    id : int
+    created_at : datetime
+
+    class config :
+        orm_mode=True
+
+class CreateUser(BaseModel) :
+    email :EmailStr
+    password :str
+
+class UserResponse(BaseModel) :
+    id : int
+    email : str
+    created_at : datetime
+
+    class config :
+        orm_mode=True
