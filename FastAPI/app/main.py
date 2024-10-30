@@ -59,15 +59,15 @@ def root () :
 #     return{"data" : posts}
 
 
-@app.get("/posts")
+@app.get("/posts",response_model=list[schemas.PostResponse])
 def get_Post(db : Session = Depends(get_db)) :
     # cursor.execute("SELECT * FROM posts")
     # posts=cursor.fetchall()
     # print(posts)
     posts=db.query(models.Post).all()
-    return{"Data":posts}
+    return posts
 
-@app.post("/posts",status_code=status.HTTP_201_CREATED)
+@app.post("/posts",status_code=status.HTTP_201_CREATED,response_model=schemas.PostResponse)
 def createPost(new_post: schemas.Create_Post,db : Session = Depends(get_db)) :
     #  print(new_post.published)
     #  print(new_post.rating)
@@ -88,9 +88,9 @@ def createPost(new_post: schemas.Create_Post,db : Session = Depends(get_db)) :
     db.add(next_post)
     db.commit()
     db.refresh(next_post)
-    return {"data":next_post}
+    return next_post
 
-@app.get("/posts/{id}")
+@app.get("/posts/{id}",response_model=schemas.PostResponse)
 def get_Data(id : int , response : Response,db : Session = Depends(get_db)) :
     # cursor.execute("SELECT * FROM posts WHERE id = %s", (id,))
     # post=cursor.fetchone()
@@ -101,7 +101,7 @@ def get_Data(id : int , response : Response,db : Session = Depends(get_db)) :
         raise HTTPException(status_code=status.HTTP_404_NOT_FOUND,detail= f"The id = {id} data not found")
         # response.status_code= status.HTTP_404_NOT_FOUND 
         # return{"message" : f"The id = {id} data not found"}
-    return{"data" : post}
+    return post
 
 @app.get("/posts/recent/latest")
 def get_latest() :
@@ -125,7 +125,7 @@ def delete_post(id : int,db : Session = Depends(get_db)) :
     # db.commit()
     return Response(status_code=status.HTTP_204_NO_CONTENT)
 
-@app.put("/posts/update/{id}")
+@app.put("/posts/update/{id}",response_model=schemas.PostResponse)
 def update_posts(id : int , post: schemas.Update_Post,db : Session = Depends(get_db)) :
     # print(post) 
     # cursor.execute("UPDATE posts SET title = %s , content = %s , published = %s WHERE id = %s",(post.title,post.content,post.published,id))
@@ -153,4 +153,12 @@ def update_posts(id : int , post: schemas.Update_Post,db : Session = Depends(get
     # my_posts[index]=post_dict
     return{"data" :"Post Updated Successfully "}
 
+# For The User 
 
+@app.post("/users",status_code=status.HTTP_201_CREATED,response_model=schemas.UserResponse)
+def CreateUser(user :schemas.CreateUser ,db: Session=Depends(get_db)) :
+    new_user = models.User(**user.dict()) #title= new_post.title ye sab nahi karka siko asia newpost ko key value pair m karka kar skta h
+    db.add(new_user)
+    db.commit()
+    db.refresh(new_user)
+    return new_user
