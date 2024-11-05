@@ -19,6 +19,6 @@ class User(Base) :
     
     id=Column(Integer,primary_key=True,nullable=False,default=lambda : random.randint(1,100000))
     email=Column(String(255),nullable=False,unique=True)
-    password=Column(String(50),nullable=False)
+    password=Column(String(255),nullable=False)
     created_at=Column(TIMESTAMP,nullable=False,server_default=text('now()'))
     

@@ -7,8 +7,9 @@ import mysql.connector
 from mysql.connector import errorcode
 import time
 from sqlalchemy.orm import Session
-from . import models,schemas
+from . import models,schemas,utils
 from .database import engine,get_db
+
 
 models.Base.metadata.create_all(bind=engine)
 
@@ -157,8 +158,18 @@ def update_posts(id : int , post: schemas.Update_Post,db : Session = Depends(get
 
 @app.post("/users",status_code=status.HTTP_201_CREATED,response_model=schemas.UserResponse)
 def CreateUser(user :schemas.CreateUser ,db: Session=Depends(get_db)) :
+    # Hash the Passworda - Which can be retrive from user.password
+
+    hashed_password=utils.hash(user.password)
+    user.password=hashed_password
+
     new_user = models.User(**user.dict()) #title= new_post.title ye sab nahi karka siko asia newpost ko key value pair m karka kar skta h
     db.add(new_user)
     db.commit()
     db.refresh(new_user)
     return new_user
+
+@app.get("/users",response_model=list[schemas.UserResponse]) 
+def getUser(db : Session = Depends(get_db)) :
+    allUser=db.query(models.User).all()
+    return allUser
