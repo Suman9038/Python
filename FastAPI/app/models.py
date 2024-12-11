@@ -1,7 +1,7 @@
 from .database import Base
 from sqlalchemy.sql.sqltypes import TIMESTAMP
 from sqlalchemy.sql.expression import text
-from sqlalchemy import Column,Integer,String,Boolean
+from sqlalchemy import Column,Integer,String,Boolean,ForeignKey
 import random
 
 class Post(Base) :
@@ -12,6 +12,7 @@ class Post(Base) :
     content=Column(String(255),nullable=False)
     published=Column(Boolean,server_default=text("True"))
     created_at=(Column(TIMESTAMP,nullable=False,server_default=text('now()')))
+    user_id=Column(Integer,ForeignKey("users.id",ondelete ="CASCADE"),nullable=False)
 
 
 class User(Base) :

@@ -17,4 +17,4 @@ def userLogin(user_credentials : OAuth2PasswordRequestForm = Depends(),db : Sess
     
 
     access_token=oauth2.create_access_token(data={"user_id" : user.id})
-    return{"access token" : access_token,"token type" : "bearer "}
+    return{"access_token" : access_token,"token_type" : "bearer"}

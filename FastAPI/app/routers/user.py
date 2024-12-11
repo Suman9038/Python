@@ -6,7 +6,7 @@ from sqlalchemy.orm import Session
 router=APIRouter(tags=["User"])
 
 
-@router.post("/users",status_code=status.HTTP_201_CREATED,response_model=schemas.UserResponse)
+@router.post("/register/user",status_code=status.HTTP_201_CREATED,response_model=schemas.UserResponse)
 def CreateUser(user :schemas.CreateUser ,db: Session=Depends(get_db)) :
     # Hash the Passworda - Which can be retrive from user.password
 

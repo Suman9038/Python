@@ -30,6 +30,7 @@ class Update_Post(PostBase) :
 class PostResponse(PostBase) :
     id : int
     created_at : datetime
+    user_id : int
 
     class config :
         orm_mode=True
@@ -53,7 +54,7 @@ class UserLogin(BaseModel) :
 
 class Token(BaseModel) :
     access_token : str
-    token_type : str
+    token_type : str 
 
 class TokenData(BaseModel) :
     id : Union[int,None]

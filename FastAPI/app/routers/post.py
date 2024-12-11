@@ -23,14 +23,14 @@ def createPost(new_post: schemas.Create_Post,db : Session = Depends(get_db), use
     # cursor.execute("INSERT INTO posts(title,content,published) VALUES (%s, %s, %s) ",(new_post.title,new_post.content,new_post.published))
     # next_post=cursor.fetchone()
     # conn.commit()
-    next_post = models.Post(**new_post.dict()) #title= new_post.title ye sab nahi karka siko asia newpost ko key value pair m karka kar skta h
+    next_post = models.Post(user_id = user_id.id,**new_post.dict()) #title= new_post.title ye sab nahi karka siko asia newpost ko key value pair m karka kar skta h
     db.add(next_post)
     db.commit()
     db.refresh(next_post)
     return next_post
 
 @router.get("/posts",response_model=list[schemas.PostResponse])
-def get_Post(db : Session = Depends(get_db), user_id : int = Depends(oauth2.get_current_user)) :
+def get_Post(db : Session = Depends(get_db)) :
     # cursor.execute("SELECT * FROM posts")
     # posts=cursor.fetchall()
     # print(posts)
@@ -59,10 +59,14 @@ def delete_post(id : int,db : Session = Depends(get_db), user_id : int = Depends
     # index = find_index_post(id) if deleted_post.first() == None :
         # raise HTTPException(status_code=status.HTTP_404_NOT_FOUND,detail=f"The id you have given that is {id} that does not exist")
     # my_posts.pop(index)
-    deleted_post = db.query(models.Post).filter(models.Post.id==id).delete(synchronize_session=False)
-    db.commit()
-    if deleted_post== 0 :
+    post = db.query(models.Post).filter(models.Post.id==id).first()
+    if post is None :
         raise HTTPException(status_code=status.HTTP_404_NOT_FOUND,detail=f"The id you have given that is {id} that does not exist")
+    # print(f"Post Owner: {post.user_id}, Current User: {user_id.id}")
+    if post.user_id != user_id.id :
+        raise HTTPException(status_code=status.HTTP_403_FORBIDDEN,detail=f"Not authorized to perform the requested action")
+    deleted_post = db.query(models.Post).filter(models.Post.id==id).delete(synchronize_session=False)
+    db.commit() 
     # my_posts.pop(index)
     # deleted_post.delete(synchronize_session=False)
     # db.commit()
@@ -85,13 +89,20 @@ def update_posts(id : int , post: schemas.Update_Post,db : Session = Depends(get
     # db.commit()
 
     # 2 method 
-    updated_posts = db.query(models.Post).filter(models.Post.id==id).update(post.dict(),synchronize_session=False)
-    db.commit()
-    if updated_posts == 0 :
+    posted = db.query(models.Post).filter(models.Post.id==id).first()
+    if posted is None : 
         raise HTTPException(status_code=status.HTTP_404_NOT_FOUND,detail=f"The id you have given that is {id} that does not exist")
+    if posted.user_id != user_id.id :
+          raise HTTPException(status_code=status.HTTP_403_FORBIDDEN,detail=f"Not authorized to perform the requested action")
+    db.query(models.Post).filter(models.Post.id==id).update(post.dict(),synchronize_session=False)
+    db.commit()
+    updated_posts = db.query(models.Post).filter(models.Post.id==id).first()
+    db.refresh(updated_posts)
+    # if updated_posts == 0 :
+    #     raise HTTPException(status_code=status.HTTP_404_NOT_FOUND,detail=f"The id you have given that is {id} that does not exist")
     
     
     # post_dict=post.dict()
     # post_dict["id"]=id
     # my_posts[index]=post_dict
-    return{"data" :"Post Updated Successfully "}
+    return updated_posts
