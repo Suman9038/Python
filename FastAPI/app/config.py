@@ -1,16 +1,17 @@
+from dotenv import load_dotenv
+load_dotenv()
 from pydantic_settings import BaseSettings
+import os
 
-class Setting(BaseSettings) :
-    database_hostname: str
-    database_port: str
-    database_password: str
-    database_name: str
-    database_username: str
-    secret_key: str
-    algorithm: str
-    access_token_expire_minute: int
+class Settings(BaseSettings) :
+    DB_URL: str
+    SECRET_KEY: str
+    ALGORITHM: str
+    ACCESS_TOKEN_EXPIRE_MINUTES: int
 
     class Config:
-       env_file = "../.env"
+       env_nested_delimiter = "__"
 
-settings = Setting()
+print(os.getenv("DB_URL"))
+
+settings = Settings(_env_file= os.path.join(os.getcwd(), "app/.env"))

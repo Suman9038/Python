@@ -1,0 +1,5 @@
+ECHO is on.
+# 🔹 Python-related ignore files
+__pycache__/
+env/
+.env

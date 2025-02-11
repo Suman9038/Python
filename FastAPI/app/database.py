@@ -4,10 +4,10 @@ from sqlalchemy.orm import sessionmaker
 import mysql.connector
 from mysql.connector import errorcode
 import time
-# from .config import settings
+from .config import settings
 
-Database_URL="mysql://root:suman2003@localhost/fastapi"
-# Database_URL=f"mysql://{settings.database_username}:{settings.database_password}@{settings.database_hostname}/{settings.database_name}"
+# Database_URL="mysql://root:suman2003@localhost/fastapi"
+Database_URL= settings.DB_URL
 
 engine= create_engine(Database_URL)
 
