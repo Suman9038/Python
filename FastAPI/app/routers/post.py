@@ -2,6 +2,7 @@ from fastapi import FastAPI,Response,status,HTTPException,Depends,APIRouter
 from .. import models,schemas,utils,oauth2
 from ..database import get_db
 from sqlalchemy.orm import Session
+from typing import Optional
 
 router=APIRouter(tags=["Posts"])
 
@@ -30,11 +31,22 @@ def createPost(new_post: schemas.Create_Post,db : Session = Depends(get_db), use
     return next_post
 
 @router.get("/posts",response_model=list[schemas.PostResponse])
-def get_Post(db : Session = Depends(get_db)) :
+def get_Post(db : Session = Depends(get_db),search: Optional[str]="",limit: int= 5,skip: int= 0) :
     # cursor.execute("SELECT * FROM posts")
     # posts=cursor.fetchall()
     # print(posts)
-    posts=db.query(models.Post).all()
+    # print(limit)
+    print(f"Search Query Received: {search}")
+    posts=db.query(models.Post).filter(models.Post.title.contains(search)).limit(limit).offset(skip).all()
+    return posts
+
+@router.get("/posts/user",response_model=list[schemas.PostResponse])
+def get_Post(db : Session = Depends(get_db),user_id : int = Depends(oauth2.get_current_user),limit: int= 5,skip: int= 0) :
+    # cursor.execute("SELECT * FROM posts")
+    # posts=cursor.fetchall()
+    # print(posts)
+    # print(limit)
+    posts=db.query(models.Post).filter(models.Post.user_id == user_id.id).limit(limit).offset(skip).all()
     return posts
 
 
